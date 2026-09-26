@@ -1,0 +1,54 @@
+Raspberry Pi üzerinde önerilen kurulum (Debian/Raspberry Pi OS):
+
+1) Paketleri kur:
+sudo apt update
+sudo apt install -y x11vnc novnc websockify
+
+2) VNC şifresi oluştur:
+mkdir -p ~/.vnc
+x11vnc -storepasswd ~/.vnc/passwd
+
+3) /etc/systemd/system/x11vnc.service oluştur:
+
+[Unit]
+Description=x11vnc for KlipperScreen
+After=KlipperScreen.service
+Requires=KlipperScreen.service
+
+[Service]
+Type=simple
+User=klipper
+ExecStart=/usr/bin/x11vnc -display :0 -auth guess -forever -shared -rfbauth /home/klipper/.vnc/passwd -rfbport 5900 -noxdamage
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
+
+4) /etc/systemd/system/novnc.service oluştur:
+
+[Unit]
+Description=noVNC for KlipperScreen
+After=x11vnc.service
+Requires=x11vnc.service
+
+[Service]
+Type=simple
+User=klipper
+ExecStart=/usr/bin/websockify --web=/usr/share/novnc/ 6080 localhost:5900
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
+
+5) Etkinleştir:
+sudo systemctl daemon-reload
+sudo systemctl enable --now x11vnc novnc
+
+6) Test:
+systemctl status x11vnc --no-pager
+systemctl status novnc --no-pager
+
+Tarayıcı testi:
+http://klipper.local:6080/vnc.html?autoconnect=true&resize=scale

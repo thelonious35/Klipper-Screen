@@ -1,0 +1,7 @@
+Android Studio ile:
+1. Klasörü aç.
+2. Gradle Sync.
+3. Build > Build APK(s).
+4. Çıktı: app/build/outputs/apk/debug/app-debug.apk
+
+Bu proje dış kütüphane kullanmaz; yalnızca Android WebView kullanır.
